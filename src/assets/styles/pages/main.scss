@@ -1,0 +1,78 @@
+
+.main{
+  .search_form_container{
+    min-height: 500px;
+    @media (max-width: 992px) {
+      min-height: auto;
+    }
+  }
+}
+
+
+
+
+.achievements{
+  margin-top: -50px;
+  @media (max-width: 992px) {
+    margin-top: 0;
+  }
+}
+
+.card{
+  background-color: $blue;
+  padding: 1rem;
+  border-radius: 0.2rem;
+  box-shadow: 4px 4px 5px 0px rgba(0, 0, 0, 0.25);
+  color: $white;
+  h4{
+    font-size: 20px;
+    text-align: center;
+  }
+  .card__text{
+    font-size: 18px;
+    text-align: justify;
+  }
+  @media (max-width: 992px) {
+    margin-bottom: 1rem;
+  }
+}
+.achievements__cards{
+  @media (max-width: 992px) {
+   justify-content: center;
+  }
+}
+
+.information{
+  margin-top: 50px;
+}
+
+.about_img{
+  display: flex;
+  justify-content: center;
+  img{
+    max-width: 80%;
+  }
+  @media (max-width: 992px) {
+   display: none;
+  }
+}
+.about_us{
+  h3{
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  .about_us__text{
+    font-size: 18px;
+    text-align: justify;
+  }
+}
+
+.faq_section{
+  h3{
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+}
+
+

@@ -1,0 +1,49 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "env": {
+    "es6": true,
+    "browser": true
+  },
+  "plugins": [
+    "react",
+    "@typescript-eslint",
+    "prettier"
+  ],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2020,
+    "sourceType": "module"
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "prettier",
+    "plugin:react/recommended"
+  ],
+  "rules": {
+    "prefer-template": "off",
+    "no-var": 1,
+    "no-unused-vars": 1,
+    "camelcase": 1,
+    "no-nested-ternary": 1,
+    "no-console": 1,
+    "no-template-curly-in-string": 1,
+    "no-self-compare": 1,
+    "import/prefer-default-export": 0,
+    "arrow-body-style": 1,
+    "import/no-extraneous-dependencies": ["off", { "devDependencies": false }]
+  },
+  "ignorePatterns": ["dist", "node_modules", "webpack.*", "paths.js"],
+  "settings": {
+    "import/resolver": {
+      "webpack": {
+        "config": "config/webpack.common.js"
+      }
+    }
+  }
+}
