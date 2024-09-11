@@ -63,7 +63,7 @@ module.exports = {
         //type: 'asset/resource',
         loader: 'file-loader',
         options: {
-          name: 'assets/[name].[ext]?[contenthash]',
+          name: 'assets/[name].[ext]',
         },
       },
 

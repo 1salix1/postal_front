@@ -52,12 +52,10 @@ const router = createBrowserRouter(
     {
       path: '/track',
       element: prepareLayout(<ParcelTracking />),
-      children: [
-        {
-          path: ':trackNumber',
-          element: prepareLayout(<ParcelTracking />),
-        },
-      ],
+    },
+    {
+      path: '/track/:trackNumber',
+      element: prepareLayout(<ParcelTracking />),
     },
     {
       path: '/parcels',
