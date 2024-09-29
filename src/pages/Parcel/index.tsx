@@ -3,11 +3,76 @@ import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Button, Col, Form, Input, Popconfirm, Row, Select } from 'antd'
 import { AddStatus, EditStatus } from '../../modals/Parcel'
-import { IParcelFields } from '../../models/parcel'
+import { IParcelFields } from 'models/parcel'
 import { DeleteFilled } from '@ant-design/icons'
 import { useAppDispatch, useAppSelector } from 'hooks/redux'
 import { deleteParcelStatus, getParcel, updateParcel } from 'store/reducers/parcelReducer'
 import { addNotification } from 'store/reducers/notificationHandler'
+import { Page, Text, View, Document, StyleSheet, pdf, Image, Font } from '@react-pdf/renderer'
+import dayjs from 'dayjs'
+import { Canvg } from 'canvg'
+import { QRCodeSVG } from 'qrcode.react'
+import { renderToString } from 'react-dom/server'
+
+Font.register({
+  family: 'Roboto',
+  fonts: [
+    {
+      src: 'https://cdn.jsdelivr.net/npm/roboto-font@0.1.0/fonts/Roboto/roboto-regular-webfont.ttf',
+      fontWeight: 400,
+    },
+    {
+      src: 'https://cdn.jsdelivr.net/npm/roboto-font@0.1.0/fonts/Roboto/roboto-bold-webfont.ttf',
+      fontWeight: 700,
+    },
+  ],
+})
+
+const PDFStyles = StyleSheet.create({
+  page: {
+    backgroundColor: '#FFFFFF',
+    fontSize: '10px',
+    fontWeight: 400,
+    fontFamily: 'Roboto',
+    padding: '30px 40px',
+  },
+  section: {
+    marginTop: 10,
+    fontFamily: 'Roboto',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    fontFamily: 'Roboto',
+    marginBottom: 3,
+  },
+  rowLeft: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    fontFamily: 'Roboto',
+    alignItems: 'flex-start',
+    marginBottom: 3,
+    fontSize: 10,
+  },
+  rowLeftInformation: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    fontFamily: 'Roboto',
+    alignItems: 'flex-start',
+    fontSize: 9,
+    width: '100%',
+    borderBottom: '1px solid #000',
+    padding: 2,
+  },
+  licence: {
+    textAlign: 'right',
+    fontSize: 8,
+    position: 'absolute',
+    right: 30,
+    bottom: 40,
+  },
+})
 
 const Parcel: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -50,6 +115,123 @@ const Parcel: React.FC = () => {
     })
   }
 
+  const svgToDataUri = async (svgString: string) => {
+    try {
+      const canvas: HTMLCanvasElement = document.createElement('canvas')
+      const context = canvas.getContext('2d')
+      if (context) {
+        const v = Canvg.fromString(context, svgString.trim())
+        await v.render()
+        const dataUri = canvas.toDataURL('image/png')
+        return dataUri
+      }
+    } catch (error) {
+      console.error('Error occured:', error)
+      return ''
+    }
+  }
+
+  const print = async () => {
+    if (parcel) {
+      let parcelType = 'Заказное письмо'
+      if (parcel.type === 2) {
+        parcelType = 'Ценное письмо с описью вложения'
+      }
+      if (parcel.type === 3) {
+        parcelType = 'Бандероль'
+      }
+      if (parcel.type === 4) {
+        parcelType = 'Посылка'
+      }
+      /*const sender = {
+        last: parcel.sender.split(' ')[0],
+        first: parcel.sender.split(' ')[1],
+        middle: parcel.sender.split(' ')[2],
+      }
+      const senderGenitive = petrovich(sender, 'genitive')
+      const senderFIO = `${senderGenitive.last} ${senderGenitive.first} ${senderGenitive.middle}`
+      const receiver = {
+        last: parcel.receiver.split(' ')[0],
+        first: parcel.receiver.split(' ')[1],
+        middle: parcel.receiver.split(' ')[2],
+      }
+      const receiverDative = petrovich(receiver, 'dative')
+      const receiverFIO = `${receiverDative.last} ${receiverDative.first} ${receiverDative.middle}`*/
+      let date = parcel.createdAt
+      if (parcel.statuses) {
+        if (parcel.statuses[parcel.statuses.length - 1]?.createdAt) {
+          date = parcel.statuses[parcel.statuses.length - 1].createdAt
+        }
+      }
+      const qrCode = <QRCodeSVG size={256} value={`https://юцепт.рф/track/${parcel.trackNumber}`} />
+      const qrCodeURL = await svgToDataUri(renderToString(qrCode))
+      const MyDocument = (
+        <Document>
+          <Page size='A5' orientation={'landscape'} style={PDFStyles.page}>
+            <View style={PDFStyles.rowLeft}>
+              <View style={[PDFStyles.row, { flexWrap: 'wrap', flexDirection: 'column', marginRight: 'auto' }]}>
+                <View style={PDFStyles.rowLeft}>
+                  <Text style={{ fontWeight: 700, marginRight: 5 }}>От Кого:</Text>
+                  <Text style={{ fontWeight: 400 }}>{parcel.sender}</Text>
+                </View>
+                <View style={PDFStyles.rowLeft}>
+                  <Text style={{ fontWeight: 700, marginRight: 5 }}>Откуда:</Text>
+                  <Text style={{ fontWeight: 400 }}>{parcel.addressFrom}</Text>
+                </View>
+              </View>
+              <View
+                style={[
+                  PDFStyles.row,
+                  { flexWrap: 'wrap', flexDirection: 'column', border: '1px solid #000', borderBottom: 0 },
+                ]}
+              >
+                <View style={PDFStyles.rowLeftInformation}>
+                  <Text style={{ fontWeight: 700, marginRight: 'auto' }}>Дата:</Text>
+                  <Text style={{ fontWeight: 400, marginLeft: 5 }}>
+                    {dayjs(date, 'DD.MM.YYYY').format('DD.MM.YYYY')}
+                  </Text>
+                </View>
+                <View style={PDFStyles.rowLeftInformation}>
+                  <Text style={{ fontWeight: 700, marginRight: 'auto' }}>№ Отправления:</Text>
+                  <Text style={{ fontWeight: 400, marginLeft: 5 }}>{parcel.trackNumber}</Text>
+                </View>
+                <View style={PDFStyles.rowLeftInformation}>
+                  <Text style={{ fontWeight: 700, marginRight: 'auto' }}>Тип Отправления:</Text>
+                  <Text style={{ fontWeight: 400, marginLeft: 5 }}>{parcelType}</Text>
+                </View>
+              </View>
+              <Image src={qrCodeURL} style={{ width: 50, height: 50, marginLeft: 10 }} />
+            </View>
+            <View style={[PDFStyles.row, { marginTop: 100 }]}>
+              <View style={[PDFStyles.row, { flexWrap: 'wrap', flexDirection: 'column', marginLeft: 'auto' }]}>
+                <View style={PDFStyles.rowLeft}>
+                  <Text style={{ fontWeight: 700, marginRight: 5 }}>Кому:</Text>
+                  <Text style={{ fontWeight: 400 }}>{parcel.receiver}</Text>
+                </View>
+                <View style={PDFStyles.rowLeft}>
+                  <Text style={{ fontWeight: 700, marginRight: 5 }}>Куда:</Text>
+                  <Text style={{ fontWeight: 400 }}>{parcel.addressTo}</Text>
+                </View>
+              </View>
+            </View>
+            <Text style={PDFStyles.licence}>Лицензия Роскомнадзора 183594</Text>
+          </Page>
+        </Document>
+      )
+
+      const blob = await pdf(MyDocument).toBlob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.style.display = 'none'
+      a.href = url
+      // the filename you want
+      a.download = `Бланк Конверта.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+    }
+  }
+
   return (
     parcel && (
       <div className={'parcel'}>
@@ -57,6 +239,7 @@ const Parcel: React.FC = () => {
           <Row justify={'start'} className={'parcels_header'}>
             <Button onClick={() => navigate(-1)}>Назад</Button>
             <h3>Отправление {parcel.trackNumber}</h3>
+            <Button onClick={() => print()}>Печать конверта</Button>
           </Row>
           <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
             <Col md={12} xs={24}>

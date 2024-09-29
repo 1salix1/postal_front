@@ -91,8 +91,8 @@ const Parcels: React.FC = () => {
             return {
               key: parcel.id,
               ...parcel,
-              lastStatus: parcel.statuses[0].description,
-              lastStatusDate: parcel.statuses[0].createdAt,
+              lastStatus: parcel?.statuses[0]?.description,
+              lastStatusDate: parcel?.statuses[0]?.createdAt,
             }
           })}
           pagination={{
@@ -113,8 +113,8 @@ const Parcels: React.FC = () => {
               <div key={parcel.id} className={'parcel'}>
                 <div className={'parcel__info'}>
                   <div className={'parcel__track'}>{parcel.trackNumber}</div>
-                  <div className={'parcel__status'}>{parcel.statuses[0].description}</div>
-                  <div className={'parcel__status_date'}>{parcel.statuses[0].createdAt}</div>
+                  <div className={'parcel__status'}>{parcel?.statuses[0]?.description}</div>
+                  <div className={'parcel__status_date'}>{parcel?.statuses[0]?.createdAt}</div>
                 </div>
                 <div className={'parcel__actions'}>
                   <Link to={'/parcel'} state={{ parcelId: parcel.id }}>
