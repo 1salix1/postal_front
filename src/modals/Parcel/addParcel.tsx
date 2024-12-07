@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { IParcelFields } from '../../models/parcel'
-import { Button, DatePicker, Form, Input, Modal, Select } from 'antd'
+import { Button, DatePicker, Form, Input, InputNumber, Modal, Select } from 'antd'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ru'
 dayjs.locale('ru')
@@ -49,7 +49,7 @@ const AddParcel = () => {
         open={open}
         centered={true}
         onCancel={() => setOpen(false)}
-        title={'Add Parcel'}
+        title={'Добавить Отправление'}
         footer={[
           <Button key='back' onClick={() => setOpen(false)}>
             Отмена
@@ -59,7 +59,7 @@ const AddParcel = () => {
           </Button>,
         ]}
       >
-        <Form form={form} onFinish={AddParcel}>
+        <Form form={form} onFinish={AddParcel} labelCol={{ md: 10, sm: 8, xs: 24 }}>
           <Form.Item name={'realTrackNumber'} label={'Настоящий трекномер'}>
             <Input />
           </Form.Item>
@@ -86,12 +86,16 @@ const AddParcel = () => {
           <Form.Item name={'addressTo'} label={'Адрес получателя'} rules={[{ required: true }]}>
             <Input />
           </Form.Item>
+          <Form.Item name={'weight'} label={'Вес отправления (г)'} rules={[{ required: false }]}>
+            <InputNumber precision={0} min={0} max={10000} />
+          </Form.Item>
           <Form.Item label={'Дата'} name={'date'} initialValue={dayjs(new Date())} rules={[{ required: true }]}>
             <DatePicker
               allowClear={false}
               format={'DD.MM.YYYY H:mm:ss'}
               changeOnBlur={true}
               showTime={true}
+              style={{ width: '100%' }}
             ></DatePicker>
           </Form.Item>
         </Form>

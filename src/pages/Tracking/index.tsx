@@ -91,7 +91,7 @@ const ParcelTracking: React.FC = () => {
             <View style={PDFStyles.row}>
               <Image style={{ width: 100 }} src={logo} />
               <Text style={{ fontSize: '10px', textAlign: 'right', maxWidth: '400px' }}>
-                Отчет сформирован официальным сайтом ООО Юцепт ИНН 4345493097 Лицензия Роскомнадзора - 183594{' '}
+                Отчет сформирован официальным сайтом ООО Юцепт ИНН 4345493097{' '}
                 {dayjs(new Date()).format('DD MMM YYYY в HH:mm')}
               </Text>
             </View>

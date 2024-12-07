@@ -58,7 +58,7 @@ const AddStatus = () => {
         open={open}
         centered={true}
         onCancel={() => setOpen(false)}
-        title={'Add Status'}
+        title={'Добавить Статус'}
         footer={[
           <Button key='back' onClick={() => setOpen(false)}>
             Отмена
@@ -68,7 +68,7 @@ const AddStatus = () => {
           </Button>,
         ]}
       >
-        <Form form={form} onFinish={addStatus}>
+        <Form form={form} onFinish={addStatus} labelCol={{ sm: 6, xs: 24 }}>
           <Form.Item label={'Описание'} name={'description'} rules={[{ required: true }]}>
             <Input />
           </Form.Item>
@@ -78,6 +78,7 @@ const AddStatus = () => {
               format={'DD.MM.YYYY H:mm:ss'}
               showTime={true}
               changeOnBlur={true}
+              style={{ width: '100%' }}
             ></DatePicker>
           </Form.Item>
         </Form>

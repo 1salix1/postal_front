@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Button, Col, Form, Input, Popconfirm, Row, Select } from 'antd'
+import { Button, Col, Form, Input, InputNumber, Popconfirm, Row, Select } from 'antd'
 import { AddStatus, EditStatus } from '../../modals/Parcel'
 import { IParcelFields } from 'models/parcel'
 import { DeleteFilled } from '@ant-design/icons'
@@ -52,6 +52,7 @@ const PDFStyles = StyleSheet.create({
     justifyContent: 'flex-start',
     fontFamily: 'Roboto',
     alignItems: 'flex-start',
+    flexWrap: 'wrap',
     marginBottom: 3,
     fontSize: 10,
   },
@@ -60,7 +61,7 @@ const PDFStyles = StyleSheet.create({
     justifyContent: 'flex-start',
     fontFamily: 'Roboto',
     alignItems: 'flex-start',
-    fontSize: 9,
+    fontSize: 8,
     width: '100%',
     borderBottom: '1px solid #000',
     padding: 2,
@@ -71,6 +72,12 @@ const PDFStyles = StyleSheet.create({
     position: 'absolute',
     right: 30,
     bottom: 40,
+  },
+  text: {
+    fontWeight: 400,
+    fontSize: 8,
+    textAlign: 'center',
+    marginBottom: 5,
   },
 })
 
@@ -133,9 +140,9 @@ const Parcel: React.FC = () => {
 
   const print = async () => {
     if (parcel) {
-      let parcelType = 'Заказное письмо'
+      let parcelType = 'Заказное'
       if (parcel.type === 2) {
-        parcelType = 'Ценное письмо с описью вложения'
+        parcelType = 'С описью вложения'
       }
       if (parcel.type === 3) {
         parcelType = 'Бандероль'
@@ -143,20 +150,6 @@ const Parcel: React.FC = () => {
       if (parcel.type === 4) {
         parcelType = 'Посылка'
       }
-      /*const sender = {
-        last: parcel.sender.split(' ')[0],
-        first: parcel.sender.split(' ')[1],
-        middle: parcel.sender.split(' ')[2],
-      }
-      const senderGenitive = petrovich(sender, 'genitive')
-      const senderFIO = `${senderGenitive.last} ${senderGenitive.first} ${senderGenitive.middle}`
-      const receiver = {
-        last: parcel.receiver.split(' ')[0],
-        first: parcel.receiver.split(' ')[1],
-        middle: parcel.receiver.split(' ')[2],
-      }
-      const receiverDative = petrovich(receiver, 'dative')
-      const receiverFIO = `${receiverDative.last} ${receiverDative.first} ${receiverDative.middle}`*/
       let date = parcel.createdAt
       if (parcel.statuses) {
         if (parcel.statuses[parcel.statuses.length - 1]?.createdAt) {
@@ -168,13 +161,18 @@ const Parcel: React.FC = () => {
       const MyDocument = (
         <Document>
           <Page size='A5' orientation={'landscape'} style={PDFStyles.page}>
-            <View style={PDFStyles.rowLeft}>
-              <View style={[PDFStyles.row, { flexWrap: 'wrap', flexDirection: 'column', marginRight: 'auto' }]}>
-                <View style={PDFStyles.rowLeft}>
+            <View style={[PDFStyles.rowLeft, { flexWrap: 'nowrap' }]}>
+              <View
+                style={[
+                  PDFStyles.row,
+                  { flexWrap: 'wrap', flexDirection: 'column', marginRight: 'auto', maxWidth: 290 },
+                ]}
+              >
+                <View style={[PDFStyles.rowLeft]}>
                   <Text style={{ fontWeight: 700, marginRight: 5 }}>От Кого:</Text>
                   <Text style={{ fontWeight: 400 }}>{parcel.sender}</Text>
                 </View>
-                <View style={PDFStyles.rowLeft}>
+                <View style={[PDFStyles.rowLeft]}>
                   <Text style={{ fontWeight: 700, marginRight: 5 }}>Откуда:</Text>
                   <Text style={{ fontWeight: 400 }}>{parcel.addressFrom}</Text>
                 </View>
@@ -196,14 +194,19 @@ const Parcel: React.FC = () => {
                   <Text style={{ fontWeight: 400, marginLeft: 5 }}>{parcel.trackNumber}</Text>
                 </View>
                 <View style={PDFStyles.rowLeftInformation}>
-                  <Text style={{ fontWeight: 700, marginRight: 'auto' }}>Тип Отправления:</Text>
+                  <Text style={{ fontWeight: 700, marginRight: 'auto' }}>Вид Отправления:</Text>
                   <Text style={{ fontWeight: 400, marginLeft: 5 }}>{parcelType}</Text>
                 </View>
               </View>
               <Image src={qrCodeURL} style={{ width: 50, height: 50, marginLeft: 10 }} />
             </View>
             <View style={[PDFStyles.row, { marginTop: 100 }]}>
-              <View style={[PDFStyles.row, { flexWrap: 'wrap', flexDirection: 'column', marginLeft: 'auto' }]}>
+              <View
+                style={[
+                  PDFStyles.row,
+                  { flexWrap: 'wrap', flexDirection: 'column', marginLeft: 'auto', maxWidth: 320 },
+                ]}
+              >
                 <View style={PDFStyles.rowLeft}>
                   <Text style={{ fontWeight: 700, marginRight: 5 }}>Кому:</Text>
                   <Text style={{ fontWeight: 400 }}>{parcel.receiver}</Text>
@@ -214,7 +217,6 @@ const Parcel: React.FC = () => {
                 </View>
               </View>
             </View>
-            <Text style={PDFStyles.licence}>Лицензия Роскомнадзора 183594</Text>
           </Page>
         </Document>
       )
@@ -232,6 +234,132 @@ const Parcel: React.FC = () => {
     }
   }
 
+  const printReceipt = async () => {
+    if (parcel) {
+      let parcelType = 'Заказное'
+      if (parcel.type === 2) {
+        parcelType = 'С описью вложения'
+      }
+      if (parcel.type === 3) {
+        parcelType = 'Бандероль'
+      }
+      if (parcel.type === 4) {
+        parcelType = 'Посылка'
+      }
+      let date = parcel.createdAt
+      if (parcel.statuses) {
+        if (parcel.statuses[parcel.statuses.length - 1]?.createdAt) {
+          date = parcel.statuses[parcel.statuses.length - 1].createdAt
+        }
+      }
+      const qrCode = <QRCodeSVG size={256} value={`https://юцепт.рф/track/${parcel.trackNumber}`} />
+      const qrCodeURL = await svgToDataUri(renderToString(qrCode))
+      const MyDocument = (
+        <Document>
+          <Page size='A5' orientation={'landscape'} style={PDFStyles.page}>
+            <View
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                flexDirection: 'row',
+                flexWrap: 'nowrap',
+              }}
+            >
+              <View style={{ width: '30%', border: '1px solid #000', padding: 10 }}>
+                <Text style={[PDFStyles.text, { borderBottom: '1px solid #000', paddingBottom: 5 }]}>
+                  ООО «Юцепт» ИНН 4345493097
+                </Text>
+                <Text style={[PDFStyles.text, { marginBottom: 2 }]}>
+                  610020, г. Киров, ул. Карла Маркса, д. 21 оф. 225
+                </Text>
+                <Text style={[PDFStyles.text, { marginBottom: 10 }]}>
+                  Дата: {dayjs(date, 'DD.MM.YYYY').format('DD.MM.YYYY')}
+                </Text>
+                <Text style={[PDFStyles.text, { marginBottom: 0 }]}>Почтовая квитанция</Text>
+                <Text style={[PDFStyles.text, { marginBottom: 10 }]}>№ {parcel.trackNumber}</Text>
+                <Text style={[PDFStyles.text, { textAlign: 'left' }]}>Принято: Почтовое отправление</Text>
+                <Text style={[PDFStyles.text, { textAlign: 'left' }]}>Тип отправления: {parcelType}</Text>
+                {parcel.weight && (
+                  <Text style={[PDFStyles.text, { textAlign: 'left', marginBottom: 10 }]}>
+                    Вес отправления: {parcel.weight} г
+                  </Text>
+                )}
+                <Text style={[PDFStyles.text, { textAlign: 'left' }]}>От Кого: {parcel.sender}</Text>
+                <Text style={[PDFStyles.text, { textAlign: 'left', marginBottom: 2 }]}>Кому: {parcel.receiver}</Text>
+                <Text style={[PDFStyles.text, { textAlign: 'left', marginBottom: 20 }]}>Куда: {parcel.addressTo}</Text>
+                <Text style={[PDFStyles.text, { textAlign: 'left', marginBottom: 10 }]}>
+                  Принял: __________________ подпись
+                </Text>
+                <View
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    flexDirection: 'row',
+                  }}
+                >
+                  <Text>М.П.</Text>
+                  <Image src={qrCodeURL} style={{ width: 30, height: 30 }} />
+                </View>
+              </View>
+              <View style={{ width: '67%', border: '1px solid #000', padding: 10 }}>
+                <Text style={{ fontWeight: 700, textAlign: 'center', fontSize: 13, marginBottom: 15 }}>
+                  Расписка в получении
+                </Text>
+
+                <View style={[PDFStyles.rowLeft, { marginBottom: 0 }]}>
+                  <Text style={{ fontWeight: 700, marginRight: 5 }}>Кому:</Text>
+                  <Text style={{ fontWeight: 400 }}>{parcel.receiver}</Text>
+                </View>
+                <View style={[PDFStyles.rowLeft, { marginBottom: 10 }]}>
+                  <Text style={{ fontWeight: 700, marginRight: 5 }}>Адрес:</Text>
+                  <Text style={{ fontWeight: 400 }}>{parcel.addressTo}</Text>
+                </View>
+                <View style={[PDFStyles.rowLeft, { marginBottom: 0 }]}>
+                  <Text style={{ fontWeight: 700, marginRight: 5 }}>Отправитель:</Text>
+                  <Text style={{ fontWeight: 400 }}>{parcel.sender}</Text>
+                </View>
+                <View style={[PDFStyles.rowLeft, { marginBottom: 15 }]}>
+                  <Text style={{ fontWeight: 700, marginRight: 5 }}>Откуда:</Text>
+                  <Text style={{ fontWeight: 400 }}>{parcel.addressFrom}</Text>
+                </View>
+                <View style={PDFStyles.rowLeft}>
+                  <Text style={{ fontWeight: 700, marginRight: 5 }}>Вид и категория:</Text>
+                  <Text style={{ fontWeight: 400 }}>{parcelType}</Text>
+                </View>
+                {parcel.weight && (
+                  <View style={PDFStyles.rowLeft}>
+                    <Text style={{ fontWeight: 700, marginRight: 5 }}>Масса:</Text>
+                    <Text style={{ fontWeight: 400 }}>{parcel.weight} г</Text>
+                  </View>
+                )}
+                <Text style={{ fontWeight: 700, marginTop: 15 }}>Отметка о принятии:</Text>
+                <Text style={{ fontWeight: 400 }}>
+                  _______________________________________________________________________
+                  _______________________________________________________________________
+                </Text>
+                <Text style={{ fontWeight: 400, fontSize: 8, textAlign: 'center' }}>(дата, должность, подпись)</Text>
+                <Image src={qrCodeURL} style={{ width: 40, height: 40, position: 'absolute', right: 20, bottom: 50 }} />
+              </View>
+            </View>
+          </Page>
+        </Document>
+      )
+
+      const blob = await pdf(MyDocument).toBlob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.style.display = 'none'
+      a.href = url
+      // the filename you want
+      a.download = `Квитанция.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+    }
+  }
+
   return (
     parcel && (
       <div className={'parcel'}>
@@ -239,11 +367,16 @@ const Parcel: React.FC = () => {
           <Row justify={'start'} className={'parcels_header'}>
             <Button onClick={() => navigate(-1)}>Назад</Button>
             <h3>Отправление {parcel.trackNumber}</h3>
-            <Button onClick={() => print()}>Печать конверта</Button>
+            <Button style={{ margin: 3 }} onClick={() => print()}>
+              Печать конверта
+            </Button>
+            <Button style={{ margin: 3 }} onClick={() => printReceipt()}>
+              Печать квитанции
+            </Button>
           </Row>
           <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
             <Col md={12} xs={24}>
-              <Form form={parcelFrom} onFinish={editParcel}>
+              <Form form={parcelFrom} onFinish={editParcel} labelCol={{ md: 10, sm: 8, xs: 24 }}>
                 <Form.Item name={'trackNumber'} label={'Трекномер'} initialValue={parcel?.trackNumber}>
                   <Input readOnly />
                 </Form.Item>
@@ -267,7 +400,7 @@ const Parcel: React.FC = () => {
                 </Form.Item>
                 <Form.Item
                   name={'sender'}
-                  label={'ФИО отправителя'}
+                  label={'Отправитель'}
                   initialValue={parcel?.sender}
                   rules={[{ required: true }]}
                 >
@@ -283,7 +416,7 @@ const Parcel: React.FC = () => {
                 </Form.Item>
                 <Form.Item
                   name={'receiver'}
-                  label={'ФИО получателя'}
+                  label={'Получатель'}
                   initialValue={parcel?.receiver}
                   rules={[{ required: true }]}
                 >
@@ -297,7 +430,15 @@ const Parcel: React.FC = () => {
                 >
                   <Input />
                 </Form.Item>
-                <Button loading={isLoading} type={'primary'} htmlType={'submit'}>
+                <Form.Item
+                  name={'weight'}
+                  label={'Вес отправления (г)'}
+                  initialValue={parcel?.weight}
+                  rules={[{ required: false }]}
+                >
+                  <InputNumber precision={0} min={0} max={10000} />
+                </Form.Item>
+                <Button style={{ float: 'right' }} loading={isLoading} type={'primary'} htmlType={'submit'}>
                   Изменить
                 </Button>
               </Form>

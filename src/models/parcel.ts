@@ -19,6 +19,7 @@ export interface IParcelFields {
   addressFrom: string
   addressTo: string
   createdAt?: string
+  weight?: number
 }
 
 export interface IParcels {

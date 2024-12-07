@@ -60,7 +60,7 @@ const EditStatus = ({ parcelStatus }: { parcelStatus: IParcelStatus }) => {
             </Button>,
           ]}
         >
-          <Form form={form} onFinish={updateStatus}>
+          <Form form={form} onFinish={updateStatus} labelCol={{ sm: 6, xs: 24 }}>
             <Form.Item
               label={'Описание'}
               name={'description'}
@@ -80,6 +80,7 @@ const EditStatus = ({ parcelStatus }: { parcelStatus: IParcelStatus }) => {
                 format={'DD.MM.YYYY H:mm:ss'}
                 showTime={true}
                 changeOnBlur={true}
+                style={{ width: '100%' }}
               ></DatePicker>
             </Form.Item>
           </Form>
